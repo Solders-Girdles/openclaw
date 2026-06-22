@@ -176,6 +176,30 @@ describe("shortenHomeInString", () => {
 
     vi.unstubAllEnvs();
   });
+
+  it("does not shorten path prefixes that only start with OPENCLAW_HOME", () => {
+    vi.stubEnv("OPENCLAW_HOME", "/srv/openclaw-home");
+    vi.stubEnv("HOME", "/home/other");
+
+    expect(shortenHomeInString("path: /srv/openclaw-home2/file")).toBe(
+      "path: /srv/openclaw-home2/file",
+    );
+
+    vi.unstubAllEnvs();
+  });
+
+  it("shortens repeated home paths only at path boundaries", () => {
+    vi.stubEnv("OPENCLAW_HOME", "/srv/openclaw-home");
+    vi.stubEnv("HOME", "/home/other");
+
+    expect(
+      shortenHomeInString(
+        "paths: /srv/openclaw-home/a /srv/openclaw-home2/b /srv/openclaw-home\\c",
+      ),
+    ).toBe("paths: $OPENCLAW_HOME/a /srv/openclaw-home2/b $OPENCLAW_HOME\\c");
+
+    vi.unstubAllEnvs();
+  });
 });
 
 describe("resolveJidToE164", () => {

@@ -345,7 +345,27 @@ export function shortenHomeInString(input: string): string {
   if (!display) {
     return input;
   }
-  return input.split(display.home).join(display.prefix);
+  const { home, prefix } = display;
+  let output = "";
+  let cursor = 0;
+
+  while (cursor < input.length) {
+    const index = input.indexOf(home, cursor);
+    if (index === -1) {
+      output += input.slice(cursor);
+      break;
+    }
+
+    const afterHome = input[index + home.length];
+    const canShorten = afterHome === undefined || afterHome === "/" || afterHome === "\\";
+    output += input.slice(cursor, index);
+    output += canShorten
+      ? `${prefix}${input.slice(index + home.length, index + home.length + (afterHome ? 1 : 0))}`
+      : home;
+    cursor = index + home.length + (canShorten && afterHome ? 1 : 0);
+  }
+
+  return output;
 }
 
 export function displayPath(input: string): string {
