@@ -191,12 +191,11 @@ describe("shortenHomeInString", () => {
   it("shortens repeated home paths only at path boundaries", () => {
     vi.stubEnv("OPENCLAW_HOME", "/srv/openclaw-home");
     vi.stubEnv("HOME", "/home/other");
+    const home = path.resolve("/srv/openclaw-home");
 
-    expect(
-      shortenHomeInString(
-        "paths: /srv/openclaw-home/a /srv/openclaw-home2/b /srv/openclaw-home\\c",
-      ),
-    ).toBe("paths: $OPENCLAW_HOME/a /srv/openclaw-home2/b $OPENCLAW_HOME\\c");
+    expect(shortenHomeInString(`paths: ${home}/a ${home}2/b ${home}\\c`)).toBe(
+      `paths: $OPENCLAW_HOME/a ${home}2/b $OPENCLAW_HOME\\c`,
+    );
 
     vi.unstubAllEnvs();
   });
